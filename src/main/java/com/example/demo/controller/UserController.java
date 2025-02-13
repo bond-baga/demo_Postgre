@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.dto.LoginForm;
 import com.example.demo.dto.UserForm;
 import com.example.demo.service.LoginService;
+import com.example.demo.service.NameService;
 import com.example.demo.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,17 +24,30 @@ import jakarta.servlet.http.HttpSession;
 public class UserController {
     @Autowired
     UserService userService;
-    
+        
     @Autowired
     LoginService loginService;
     
-    @GetMapping("/")
-    public String success(@ModelAttribute("UserForm")UserForm form, Model model, HttpSession session) {
-        model.addAttribute("title", "一覧");
-        if (session.getAttribute("user") == null) {
-            form.getChecked().add("通常");
+    @Autowired
+    NameService nameService;
+
+    @GetMapping(value={"/","/menu"})
+    public String getHome(Model model, HttpSession session) {
+        model.addAttribute("title", "メニュー");
+        // セッションの初期化は行わない
+        // セッションにログインユーザーを保存
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        session.setAttribute("user", loginService.select(auth.getName()));        
+        return "menu";
+    }
+    
+    @GetMapping(value={"/list"})
+    public String getList(@ModelAttribute("UserForm")UserForm form, Model model, HttpSession session) {
+    	model.addAttribute("title", "一覧");    	
+        if (session.getAttribute("user") == null || form.getStateKeys().size()==0) {
+            form.getStateKeys().add(1);
+            form.setStatusKey(1);
         }
-        model.addAttribute("UserForm", form);
         // セッションの初期化は行わない
         // セッションにログインユーザーを保存
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -45,125 +58,157 @@ public class UserController {
         data.put("users", userService.select(form));
         model.addAttribute("data", data);
         // プルダウン項目の取得
-        Map<String, List<Map<String, Object>>> items = new HashMap<>();
-        // 状態は空白行を設けない
-        items.put("statename", userService.items_no_blank("statename"));
-        items.put("divisionname", userService.items("divisionname"));
-        model.addAttribute("items", items);
+        form.getItems().put("state", nameService.getState());
+        form.getItems().put("status", nameService.getStatus());
         return "list";
     }
+    
+    @GetMapping("/insert")
+    public String getInsert(@ModelAttribute("UserForm") UserForm form, @ModelAttribute("map") HashMap<String,String> map, Model model, HttpSession session) {
+        model.addAttribute("title", "新規");
+    	if (map.containsKey("msg")) {
+            //更新：@PostMapping("/update_write")から遷移した場合
+        	//フラッシュスコープのformを使用する
+        }else {
+        	//一覧から遷移した場合
+        	UserForm formInsert = new UserForm();//userService.select(form.getCode());
+            // プルダウン項目の取得
+            formInsert.getItems().put("state", nameService.getState());
+            formInsert.getItems().put("status", nameService.getStatus());        	
+        	model.addAttribute("UserForm", formInsert);
+        }
+        model.addAttribute("user", session.getAttribute("user"));
+        return "edit";
+    } 
 
-    @GetMapping(value={"/login"})
-    public String getHome(@ModelAttribute("LoginForm")LoginForm form, @ModelAttribute("map")HashMap<String, Boolean> map, Model model) {
-      model.addAttribute("title", "ログイン");
-      model.addAttribute("LoginForm", form);
-      if (!map.containsKey("registered")) {
-      	map.put("registered", false);
-      }
-      
-      model.addAttribute("map", map);
-  	  return "login";
+    @GetMapping("/update")
+    public String getUpdate(@ModelAttribute("UserForm") UserForm form, @ModelAttribute("map") HashMap<String,String> map, Model model, HttpSession session) {
+        model.addAttribute("title", "更新");
+    	if (map.containsKey("msg")) {
+            //更新：@PostMapping("/update_write")から遷移した場合
+        	//フラッシュスコープのformを使用する
+        }else {
+        	//一覧から遷移した場合
+        	UserForm formUpdate = userService.select(form.getCode());
+        	formUpdate.setStateKeys(form.getStateKeys());
+        	formUpdate.setStatusKey(form.getStatusKey());
+        	// プルダウン項目の取得
+            formUpdate.getItems().put("state", nameService.getState());
+            formUpdate.getItems().put("status", nameService.getStatus());        	
+        	model.addAttribute("UserForm", formUpdate);
+        }
+        model.addAttribute("user", session.getAttribute("user"));
+        return "edit";
+    } 
+
+    @GetMapping("/delete")
+    public String getDelete(@ModelAttribute("UserForm") UserForm form, @ModelAttribute("map") HashMap<String,String> map, Model model, HttpSession session) {
+        model.addAttribute("title", "削除");
+    	if (map.containsKey("msg")) {
+            //更新：@PostMapping("/update_write")から遷移した場合
+        	//フラッシュスコープのformを使用する
+        }else {
+        	//一覧から遷移した場合
+        	UserForm formDelete = userService.select(form.getCode());
+        	formDelete.setStateKeys(form.getStateKeys());
+        	formDelete.setStatusKey(form.getStatusKey());
+            // プルダウン項目の取得
+            formDelete.getItems().put("state", nameService.getState());
+            formDelete.getItems().put("status", nameService.getStatus());        	
+        	model.addAttribute("UserForm", formDelete);
+        }
+        model.addAttribute("user", session.getAttribute("user"));
+        return "edit";
     }
     
-    @GetMapping("/register")
-    public String registerform(@ModelAttribute("LoginForm")LoginForm form, @ModelAttribute("map")HashMap<String, Boolean> map, Model model)  {
-        model.addAttribute("title", "アカウント登録");
-        model.addAttribute("LoginForm", form);
-        if (!map.containsKey("exists")) {
-        	map.put("exists", false);
-        }
-        if (!map.containsKey("failed")) {
-        	map.put("failed", false);
-        }
-        if (!map.containsKey("registered")) {
-        	map.put("registerd", false);
-        } 
-        model.addAttribute("map", map);        
-        return "register";
+    @PostMapping(value={"/list", "/search"})
+    public String postList(UserForm form, RedirectAttributes redirectAttributes, HttpSession session) {
+    	redirectAttributes.addFlashAttribute("UserForm", form); 
+        return "redirect:/list";
     }
     
-    
-    @PostMapping("/register") 
-    public String register(LoginForm form, Model model, RedirectAttributes redirectAttributes) {
-        LoginForm loginform = loginService.select(form.getUsername()); 
-    	HashMap<String, Boolean> map = new HashMap<>();
-
-    	if(loginform.getId() != 0){
-            // ユーザーが既に存在する場合の処理
-        	redirectAttributes.addFlashAttribute("LoginForm", form);  
-        	map.put("exists", true);
-        	redirectAttributes.addFlashAttribute("map", map);    	
-            return "redirect:/register"; 
-        } else {
-            if (loginService.insert(form)) {
-            	// 新規のアカウントが登録された場合　
-            	redirectAttributes.addFlashAttribute("LoginForm", form);    	
-            	map.put("registered", true);
-            	redirectAttributes.addFlashAttribute("map", map);    	
-                return "redirect:/login";             	
-            } else {
-            	// 新規のアカウントの登録に失敗した場合
-            	redirectAttributes.addFlashAttribute("LoginForm", form);    	
-            	map.put("failed", true);
-            	redirectAttributes.addFlashAttribute("map", map);    	
-                return "redirect:/register";             	            	
-            }        	
-        } 
-    }    
-        
-    @PostMapping("/search")
-    public String getsearch(UserForm form, Model model,HttpSession session, RedirectAttributes redirectAttributes) {
-    	redirectAttributes.addFlashAttribute("UserForm", form);    	
+    @PostMapping(value= {"/name"})
+    public String postName(UserForm form, Model model,HttpSession session) {
+        model.addAttribute("title", "一覧");
+        if (session.getAttribute("user") == null) {
+            form.getStateKeys().add(1);
+        }
+        model.addAttribute("UserForm", form);
+    	//redirectAttributes.addFlashAttribute("UserForm", form);    	
         // セッションにログインユーザーを保存
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         session.setAttribute("user", auth.getName());
         //session.setAttribute("user",loginService.select(auth.getName()));
-        return "redirect:/";
-    }
-
-
-    @PostMapping("/insert")
-    public String insert(@ModelAttribute UserForm form,  Model model, HttpSession session) {
-        model.addAttribute("title", "新規");
-        model.addAttribute("UserForm", userService.clear(form));
-        model.addAttribute("user", session.getAttribute("user"));
-        return "edit";
-    } 
-
-    @PostMapping("/update")
-    public String update(@ModelAttribute UserForm form,  Model model, HttpSession session) {
-        model.addAttribute("title", "更新");
-        model.addAttribute("UserForm", userService.select(form.getCode()));
-        model.addAttribute("user", session.getAttribute("user"));
-        return "edit";
-    } 
-
-    @PostMapping("/delete")
-    public String delete(@ModelAttribute UserForm form,  Model model, HttpSession session) {
-        model.addAttribute("title", "削除");
-        model.addAttribute("UserForm", userService.select(form.getCode()));
-        model.addAttribute("user", session.getAttribute("user"));
-        return "edit";
-    } 
-
-    @PostMapping("/write")
-    public String write(@ModelAttribute UserForm form,  Model model) {
-    	userService.update(form);	
-
-        model.addAttribute("title", "一覧");
-        model.addAttribute("UserForm", form);
-                
+        
         // 職員データの取得
         Map<String, List<Map<String, Object>>> data = new HashMap<>();
-        data.put("user", userService.select(form));
+        data.put("users", userService.select(form));
         model.addAttribute("data", data);
         // プルダウン項目の取得
-        Map<String, List<Map<String, Object>>> items = new HashMap<>();
-        // 状態は空白行を設けない
-        items.put("statename", userService.items_no_blank("statename"));
-        items.put("divisionname", userService.items("divisionname"));
+        Map<String, Map<Integer, String>> items = new HashMap<>();
+        items.put("state", nameService.getState()); 
+        items.put("status", nameService.getStatus());
         model.addAttribute("items", items);
+        
         return "list";
     }
     
+    @PostMapping("/insert")
+    public String postInsert(UserForm form, RedirectAttributes redirectAttributes) {
+    	redirectAttributes.addFlashAttribute("UserForm", form); 
+        return "redirect:/insert";
+    } 
+
+    @PostMapping("/update")
+    public String postUpdate(UserForm form, RedirectAttributes redirectAttributes) {
+    	redirectAttributes.addFlashAttribute("UserForm", form); 
+    	return "redirect:/update";
+    } 
+
+    @PostMapping("/delete")
+    public String postDelete(UserForm form,  RedirectAttributes redirectAttributes) {
+    	redirectAttributes.addFlashAttribute("UserForm", form); 
+        return "redirect:/delete";
+    } 
+
+    //新規
+    @PostMapping("/insert_write")
+    public String postinsert_write(UserForm form,  Model model, RedirectAttributes redirectAttributes) {
+    	// validation
+    	HashMap<String, String> map = new HashMap<>();
+    	if (form.getName()=="") {
+        	redirectAttributes.addFlashAttribute("UserForm", form);
+        	map.put("msg", "氏名が未入力です。");        	
+        	redirectAttributes.addFlashAttribute("map", map);    	
+        	return "redirect:/insert";    		
+    	}    	
+    	userService.insert(form);	
+    	redirectAttributes.addFlashAttribute("UserForm", form);
+        return "redirect:/list";
+    }
+    
+    //更新
+    @PostMapping("/update_write")
+    public String postupdate_write(UserForm form, Model model, RedirectAttributes redirectAttributes) {
+    	// validation
+    	HashMap<String, String> map = new HashMap<>();
+    	if (form.getName()=="") {
+        	redirectAttributes.addFlashAttribute("UserForm", form);
+        	map.put("msg", "氏名が未入力です。");        	
+        	redirectAttributes.addFlashAttribute("map", map);    	
+        	return "redirect:/update";    		
+    	}    	
+    	userService.update(form);	
+    	redirectAttributes.addFlashAttribute("UserForm", form);
+    	return "redirect:/list";
+    }
+ 
+    //削除
+    @PostMapping("/delete_write")
+    public String postdelete_write(UserForm form, Model model, RedirectAttributes redirectAttributes) {
+    	//引数のformに検索条件は無い。
+    	userService.delete(form);	
+    	redirectAttributes.addFlashAttribute("UserForm", form);
+    	return "redirect:/list";
+    }
 }

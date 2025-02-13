@@ -24,6 +24,12 @@ body {
     margin-top:5%;  
 }
 
+.menu{
+	width:640px;
+	margin: auto;
+    margin-top:5%;  
+}
+
 .register{
 	width:640px;
 	margin: auto;
@@ -77,22 +83,6 @@ body {
 	font-size: medium;	
 }
 
-.height10{
-	line-height:10%;
-}
-
-.height200{
-	line-height:200%;
-}
-
-.height5px{
-	line-height:5px;
-}
-
-.height10px{
-	line-height:10px;
-}
-
 .error{
 	color:red;
 	font-size: large;	
@@ -102,3 +92,20 @@ body {
 	color:blue;
 	font-size: large;	
 }
+
+.menu-table{
+	width:100%;	
+}
+
+.menu-button{
+  display: block;
+  width: 160px;
+  height: 40px;
+  /*padding: 10px 5px 10px 5px;*/	
+  margin: 10px 5px 10px 5px;	
+  font-size:x-large;	
+}
+
+
+
+

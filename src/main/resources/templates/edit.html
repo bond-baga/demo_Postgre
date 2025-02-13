@@ -17,42 +17,57 @@
   		<p><span class="title"><label id="title"></label></span></p>  		
   		<p><span class="user">
 			  <label id="user"></label>
-   			  <!--
-   			  <button type="button" onclick="logoutclick()">ログアウト</button>
-			  -->	
   		   </span>
   		</p>  		
 	</div>	
 </header>
 	
-<form class="center" id="form" method="post" th:object="${UserForm}">
+<body>
+	<div class="slightly-left">
+    <th:block p th:if="${map.containsKey('msg')}">
+		<label class="error" th:text="${map.msg}"></label>		
+	</th:block>		
+	</div>
+	    
+<form class="center" id="form" method="post" th:object="${UserForm}" th:action="@{/update_write}">
+	<input type="hidden" th:field=*{stateKeys}>
+	<input type="hidden" th:field=*{statusKey}>
 	
 	<th:block th:if="${title=='新規'}">
-	<input type="hidden" th:field=*{code}>
 	<table>
 		<tr>
             <td>コード</td>
-            <td><input type="text" th:field=*{code}></td>			
+            <td><input type="text" th:field=*{code} required/></td>			
 		</tr>
 		<tr>
             <td>氏名</td>
-            <td><input type="text" th:field=*{name}></td>						
+            <td><input type="text" th:field=*{name} required/></td>						
 		</tr>
 		<tr>
             <td>カナ</td>
-            <td><input type="text" th:field=*{kana}></td>						
+            <td><input type="text" th:field=*{kana} required/></td>						
 		</tr>
 		<tr>
             <td>状態</td>
-            <td><input type="text" th:field=*{statename}></td>									
+            <td>
+    			<select th:field="*{stateCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
 		</tr>
 		<tr>
-            <td>所属</td>
-            <td><input type="text" th:field=*{divisionname}></td>									
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>            									
 		</tr>
 		<tr>
             <td>部署</td>
-            <td><input type="text" th:field=*{sectionname}></td>						
+            <td><input type="text" th:field=*{divisionname} required/></td>						
 		</tr>
         <tr>
             <td></td>
@@ -66,31 +81,41 @@
 	</th:block>
 
 	<th:block th:if="${title=='更新'}">
-	<input type="hidden" th:field=*{code}>
 	<table>
 		<tr>
             <td>コード</td>
-            <td><input type="text" th:field=*{code} disabled></td>			
+            <td><input type="text" th:field=*{code} readonly required/></td>			
 		</tr>
 		<tr>
             <td>氏名</td>
-            <td><input type="text" th:field=*{name}></td>						
+            <td><input type="text" th:field=*{name} required/></td>						
 		</tr>
 		<tr>
             <td>カナ</td>
-            <td><input type="text" th:field=*{kana}></td>						
+            <td><input type="text" th:field=*{kana} required/></td>						
 		</tr>
 		<tr>
             <td>状態</td>
-            <td><input type="text" th:field=*{statename}></td>									
+            <td>
+    			<select th:field="*{stateCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
 		</tr>
 		<tr>
-            <td>所属</td>
-            <td><input type="text" th:field=*{divisionname}></td>									
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>
+            									
 		</tr>
 		<tr>
             <td>部署</td>
-            <td><input type="text" th:field=*{sectionname}></td>						
+            <td><input type="text" th:field=*{divisionname} required/></td>						
 		</tr>
         <tr>
             <td></td>
@@ -101,48 +126,44 @@
             </td>
         </tr>		
 	</table>
-	
-	
-	
-	<!--
-	<p>コード：<input type="text" th:field=*{code} disabled></p>
-	<p>氏名：<input type="text" th:field=*{name}></p>
-	<p>カナ：<input type="text" th:field=*{kana}></p>
-	<p>状態：<input type="text" th:field=*{statename}></p>
-	<p>所属：<input type="text" th:field=*{divisionname}></p>
-	<p>部署：<input type="text" th:field=*{sectionname}></p>
-	<button type="button" onclick="history.back()">戻る</button>
-	<button type="button" onclick="updateclick()">登録</button> 
-   	<button type="reset">Restet</button>
-	-->
 	</th:block>
 	
 	<th:block th:if="${title=='削除'}">
-	<input type="hidden" th:field=*{code}>
 		<table>
 		<tr>
             <td>コード</td>
-            <td><input type="text" th:field=*{code} disabled></td>			
+            <td><input type="text" th:field=*{code} readonly></td>			
 		</tr>
 		<tr>
             <td>氏名</td>
-            <td><input type="text" th:field=*{name} disabled></td>						
+            <td><input type="text" th:field=*{name} readonly></td>						
 		</tr>
 		<tr>
             <td>カナ</td>
-            <td><input type="text" th:field=*{kana} disabled></td>						
+            <td><input type="text" th:field=*{kana} readonly></td>						
 		</tr>
 		<tr>
             <td>状態</td>
-            <td><input type="text" th:field=*{statename} disabled></td>									
+            <td>
+    			<select th:field="*{stateCode}" disabled>
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
 		</tr>
 		<tr>
-            <td>所属</td>
-            <td><input type="text" th:field=*{divisionname} disabled></td>									
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}" disabled>
+					<option th:value="0"></option>
+					<option th:each="item:*{items.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>
+            									
 		</tr>
 		<tr>
             <td>部署</td>
-            <td><input type="text" th:field=*{sectionname} disabled></td>						
+            <td><input type="text" th:field=*{divisionname} readonly></td>						
 		</tr>
         <tr>
             <td></td>
@@ -153,20 +174,6 @@
             </td>
         </tr>		
 	</table>
-	
-	
-	
-	
-	<!--
-	<p>コード：<input type="text" th:field=*{code} disabled></p>
-	<p>氏名：<input type="text" th:field=*{name} disabled></p>
-	<p>カナ：<input type="text" th:field=*{kana} disabled></p>
-	<p>状態：<input type="text" th:field=*{statename} disabled></p>
-	<p>所属：<input type="text" th:field=*{divisionname} disabled></p>
-	<p>部署：<input type="text" th:field=*{sectionname} disabled></p>
-	<button type="button" onclick="history.back()">戻る</button>
-	<button type="button" onclick="deleteclick()">削除</button>
-	-->
 	</th:block>	
    	
 </form>
@@ -177,20 +184,6 @@
 
 <script th:inline="javascript">
 
-/*	
-var btndelete = document.getElementById("delete");
-
-
-btndelete.addEventListener("click", () => {
-	let result = confirm("削除しますか？");
-	if(result){
-  		//console.log('削除しました');
-	}else{
-  		//console.log('削除をとりやめました');
-	}	
-});
-*/
-  
 window.onload =  function() {
 	let title = /*[[${title}]]*/"title";
 	let user = /*[[${session.user['fullname']}]]*/"user";
@@ -203,16 +196,16 @@ window.onload =  function() {
   
 function insertclick() {
     let form = document.getElementById('form');
-  	form.action = "/insert";
+  	form.action = "/insert_write";
     form.submit();	
 }
 
 function updateclick() {
-	let result = confirm('１編集内容を登録しますか？');
+	let result = confirm('編集内容を登録しますか？');
 	if(!result) return;
 		
     let form = document.getElementById('form');
-  	form.action = "/update";
+  	form.action = "/update_write";
     form.submit();	
 }
 
@@ -221,7 +214,7 @@ function deleteclick() {
 	if(!result) return;
 		
     let form = document.getElementById('form');
-  	form.action = "/delete";
+  	form.action = "/delete_write";
     form.submit();	
 }
 
