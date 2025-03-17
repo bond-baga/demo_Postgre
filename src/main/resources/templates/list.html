@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      class="list">
+      
+<head>
+  <meta charset="UTF-8">
+　<link rel="stylesheet" href="./css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>list</title>
+</head>
+<body>	
+<header class="header">
+	<div class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  		
+  		<p><span class="user">
+			  <label id="user"></label>
+   			  <button type="button" onclick="menuclick()">menu</button>
+  		   </span>
+  		</p>  		
+	</div>	 
+</header>
+
+<form class="form-center" id="form" method="post" th:object="${UserForm}" th:action="@{/search}">
+	<input type="hidden" th:field=*{mapstring}>
+	
+	<div class="slightly-left">
+	<h3>検索条件を入力してください。</h3>     
+	</div>
+	
+	<table class="table-center">
+        <tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{searchname}/></td>
+        </tr>          
+        <tr>
+            <td>カナ</td>
+            <td><input type="text" th:field=*{searchkana}/></td>
+        </tr>
+
+        <tr>
+            <td>状態</td>
+            <td>
+				<th:block th:each="item:*{mapitems.get('state')}">
+      			<label th:for="${#ids.next('id_')}" th:text="${item.value}"></label>
+      			<input type="checkbox" th:id="${#ids.seq('id_')}" th:field="*{stateKeys}" th:value="${item.key}" th:checked="${#lists.contains({stateKeys}, {item.key})}">
+    			</th:block><br>	
+            </td>
+        </tr> 
+        <tr>
+          	<td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusKey}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusKey})"></option>		
+    			</select>
+			</td>			
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="searchclick()">検索</button>
+				<button type="button" onclick="insertclick()">新規</button> 
+            </td>
+        </tr>
+    </table>	
+
+	<table class="table-center" border="1"> 
+	<tr>
+    <th>コード</th>
+    <th>氏名</th>
+    <th>カナ</th>
+    <th>状態</th>
+    <th>雇用形態</th>
+    <th>部署</th>
+    <th>備考</th>
+    <th>編集</th>
+    <th>削除</th>
+  	</tr>
+  	
+	<tr th:each="user : ${data.get('users')}" th:object="${user}">
+    <td th:text="*{code}"></td>
+    <td th:text="*{name}"></td>
+    <td th:text="*{kana}"></td>
+    <td th:text="*{statename}"></td>
+    <td th:text="*{statusname}"></td>
+    <td th:text="*{divisionname}"></td>
+    <td th:text="*{remarks}"></td>
+    
+    <td>    
+	<a href="javascript:void(0);" th:onclick="updateclick([[*{code}]])">編集</a>        
+    </td>
+    
+    <td>    
+	<a href="javascript:void(0);" th:onclick="deleteclick([[*{Code}]])">削除</a>        
+    </td>
+
+  	</tr>
+	</table>
+</form>
+
+<footer class="footer">
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">
+		
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+	let user = /*[[${session.user['fullname']}]]*/"user";
+		
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+    let element_user = document.getElementById("user");	
+	element_user.textContent = "ユーザー：" + user;
+	
+	/*
+	if (localStorage.getItem('stateKeys') != null){
+		document.forms['form'].elements['stateKeys'].forEach((r)=>{if (localStorage.getItem('stateKeys').includes(r.value)) r.checked=true});
+	}
+	if (localStorage.getItem('statusKey') != null){
+		document.forms['form'].elements['statusKey'].value = localStorage.getItem('statusKey');
+	}
+	*/
+	localStorage.clear();
+}
+	 
+/*
+window.addEventListener('pagehide', () => {
+	alert('pagehide');
+});	 
+
+window.addEventListener('pageshow', () => {
+  alert('pageshow'+isNeedInit);
+});	 
+
+window.addEventListener('popstate', () => {
+  alert('popstate'+isNeedInit);
+});	 
+
+window.addEventListener('pushstate', () => {
+	alert('pushstate'+isNeedInit); 
+});	 
+
+function insertclick() {
+    let form = document.getElementById("form");
+    form.action="/insert";
+    form.submit();
+}  
+*/
+
+function insertclick() {
+    let form = document.getElementById("form");
+    form.action="/insert";
+    form.submit();
+}  
+
+function searchclick(){
+    let form = document.getElementById("form");
+    form.action="/search";
+    form.submit();	
+}
+
+function menuclick() {
+	let result = confirm('メニューに戻りますか？');
+	if (!result) return;
+    let form = document.getElementById("form");
+    form.method="get";
+    form.action="/menu";
+    form.submit();	
+}
+	
+function updateclick(code) {
+    let form = document.getElementById("form");
+    let input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "code");
+    input.setAttribute("value", code);
+    form.appendChild(input);
+    form.action="/update";
+    form.submit();	
+}  
+
+function deleteclick(code) {
+    let form = document.getElementById("form");
+    let input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "code");
+    input.setAttribute("value", code);
+    form.appendChild(input);
+    form.action="/delete";
+    form.submit();	
+}  
+
+</script>
+
+
+</body>
+</html>

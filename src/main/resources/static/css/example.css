@@ -1,0 +1,128 @@
+/*
+h1 {
+	text-align: center;;
+	color:#FFFFFF;
+ 	background-color: #000080;
+}
+*/
+
+/*
+a {
+    cursor:pointer;
+}
+*/
+
+body {
+    min-width: 100%;
+    min-height: 100%;
+  color: #1c1c1c;
+}
+
+.login{
+	width:640px;
+	margin: auto;
+    margin-top:5%;  
+}
+
+.menu{
+	width:640px;
+	margin: auto;
+    margin-top:5%;  
+}
+
+.list{
+	width:800px;
+	margin: auto;
+    margin-top:5%;  
+}
+
+.register{
+	width:640px;
+	margin: auto;
+    margin-top:5%;  
+}
+
+.edit{
+	width:640px;
+	margin: auto;
+    margin-top:5%;  
+}
+
+.header {
+	color:#FFFFFF;
+ 	background-color: #000080;
+}
+
+.footer{
+	text-align: center;	
+	color:#FFFFFF;
+ 	background-color: #000080;
+}
+
+.box{
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  justify-content: space-around;
+  height: 50px;  
+}
+
+.form-center {
+	/*
+    width: fit-content;
+    margin: auto;
+    */
+    
+    /*
+ 	display: flex;
+ 	*/
+    justify-content: center;    
+}
+
+.table-center {
+ 	display: flex;
+    justify-content: center;    
+}
+
+.menu-center{
+	width:100%;	
+ 	display: flex;
+    justify-content: center;    
+}
+
+.slightly-left{
+	padding-left:30%;
+}
+
+.title{
+	font-size: xx-large;
+}
+
+.user{
+	font-size: medium;	
+}
+
+.error{
+	color:red;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.info{
+	color:blue;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.menu-button{
+  display: block;
+  width: 160px;
+  height: 40px;
+  /*padding: 10px 5px 10px 5px;*/	
+  margin: 10px 5px 10px 5px;	
+  font-size:x-large;	
+}
+
+
+
+

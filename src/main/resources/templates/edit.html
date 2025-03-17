@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns="ctp://www.w3.org/1999/xhtml" 
+      xmlns:th="https://www.thymeleaf.org"
+      class="edit">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>edit</title>
+</head>
+
+<header class="header">
+	<div class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  		
+  		<p><span class="user">
+			  <label id="user"></label>
+  		   </span>
+  		</p>  		
+	</div>	
+</header>
+	
+<body>
+<form class="center" id="form" method="post" th:object="${UserForm}" th:action="@{/update_write}">	
+ 	<input type="hidden" th:field=*{mapstring}>
+
+	<div class="slightly-left">
+	<th:block th:if="${not UserForm.msg.isEmpty()}">
+	    <th:block th:each="item:*{msg}" th:object="${item}">
+			<label class="error" th:text="${item.value}"></label><br>		
+		</th:block>
+	</th:block>
+	<h3>職員名簿 Ver 1.0 </h3>    
+	</div>
+	    
+
+	<th:block th:if="${title=='新規'}">
+	<table class="table-center">
+		<tr>
+            <td>コード</td>
+            <td><input type="text" th:field=*{code} required/></td>			
+		</tr>
+		<tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{name} required/></td>						
+		</tr>
+		<tr>
+            <td>カナ</td>
+            <td><input type="text" th:field=*{kana} required/></td>						
+		</tr>
+		<tr>
+            <td>状態</td>
+            <td>
+    			<select th:field="*{stateCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
+		</tr>
+		<tr>
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>            									
+		</tr>
+		<tr>
+            <td>部署</td>
+            <td><input type="text" th:field=*{divisionname} required/></td>						
+		</tr>
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="history.back()">戻る</button>
+    			<button type="button" onclick="insertclick()">登録</button>
+   				<button type="reset">Restet</button>
+            </td>
+        </tr>		
+	</table>
+	</th:block>
+
+	<th:block th:if="${title=='更新'}">
+	<table class="table-center">
+		<tr>
+            <td>コード</td>
+            <td><input type="text" th:field=*{code} readonly required/></td>			
+		</tr>
+		<tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{name} required/></td>						
+		</tr>
+		<tr>
+            <td>カナ</td>
+            <td><input type="text" th:field=*{kana} required/></td>						
+		</tr>
+		<tr>
+            <td>状態</td>
+            <td>
+    			<select th:field="*{stateCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
+		</tr>
+		<tr>
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>
+            									
+		</tr>
+		<tr>
+            <td>部署</td>
+            <td><input type="text" th:field=*{divisionname} required/></td>						
+		</tr>
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="history.back()">戻る</button>
+    			<button type="button" onclick="updateclick()">登録</button>
+   				<button type="reset">Restet</button>
+            </td>
+        </tr>		
+	</table>
+	</th:block>
+	
+	<th:block th:if="${title=='削除'}">
+	<table class="table-center">
+		<tr>
+            <td>コード</td>
+            <td><input type="text" th:field=*{code} readonly></td>			
+		</tr>
+		<tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{name} readonly></td>						
+		</tr>
+		<tr>
+            <td>カナ</td>
+            <td><input type="text" th:field=*{kana} readonly></td>						
+		</tr>
+		<tr>
+            <td>状態</td>
+            <td>
+    			<select th:field="*{stateCode}" disabled>
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+    			</select>
+			</td>
+		</tr>
+		<tr>
+            <td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusCode}" disabled>
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+    			</select>
+			</td>
+            									
+		</tr>
+		<tr>
+            <td>部署</td>
+            <td><input type="text" th:field=*{divisionname} readonly></td>						
+		</tr>
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="history.back()">戻る</button>
+				<button type="button" onclick="deleteclick()">削除</button>
+            
+            </td>
+        </tr>		
+	</table>
+	</th:block>	
+
+</form>
+
+<footer class="footer">
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">
+
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+	let user = /*[[${session.user['fullname']}]]*/"user";
+	
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+    let element_user = document.getElementById("user");	
+	element_user.textContent = "ユーザー：" + user;
+}
+
+	//let url = location.href;
+	//url = url.replace('/update','/list?statusKey=1');
+	//alert (url);
+	//history.pushState(null, null, url);
+	//history.pushState(null, null, null);
+  
+/*
+window.onpopstate = function() {
+    alert("back clicked");
+    history.pushState(null, null, null);
+    backButtonClicked = false;
+    return;
+};
+
+
+window.addEventListener('popstate', (e) => {
+	//history.pushState(null, null, url);
+    alert(location.href);
+    return;
+});
+*/
+
+function insertclick() {
+	//history.pushState(null, null, null);
+    let form = document.getElementById('form');
+  	form.action = "/insert_write";
+    form.submit();	
+}
+
+function updateclick() {
+	let result = confirm('編集内容を登録しますか？');
+	if(!result) return;
+		
+    let form = document.getElementById('form');
+  	form.action = "/update_write";
+    form.submit();	
+}
+
+function deleteclick() {
+	let result = confirm('削除しますか？');
+	if(!result) return;
+		
+    let form = document.getElementById('form');
+  	form.action = "/delete_write";
+    form.submit();	
+}
+
+</script>
+
+</body>
+</html>
