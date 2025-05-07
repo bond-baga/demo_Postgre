@@ -49,7 +49,7 @@ public class TestController {
     @PostMapping(value={"/test"})
     public String postList(UserForm form, BindingResult resul, RedirectAttributes redirectAttributes, HttpSession session) {
     	// 
-		form.setStateKeys(new ArrayList<Integer>(Arrays.asList(1)));
+		form.setStatekeys(new ArrayList<Integer>(Arrays.asList(1)));
 		form.setStatusKey(1);
     	redirectAttributes.addFlashAttribute("UserForm", form); 
         return "redirect:/test";

@@ -23,8 +23,9 @@
 </header>
 	
 <body>
-<form class="center" id="form" method="post" th:object="${UserForm}" th:action="@{/update_write}">	
+<form class="center" id="form" method="post" th:object="${UserForm}" th:action="@{/update_write}" enctype="multipart/form-data">	
  	<input type="hidden" th:field=*{mapstring}>
+ 	<input type="hidden" th:field=*{imgString}>
 
 	<div class="slightly-left">
 	<th:block th:if="${not UserForm.msg.isEmpty()}">
@@ -53,18 +54,18 @@
 		<tr>
             <td>状態</td>
             <td>
-    			<select th:field="*{stateCode}">
+    			<select th:field="*{statecode}">
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statecode})"></option>		
     			</select>
 			</td>
 		</tr>
 		<tr>
             <td>雇用形態</td>
             <td>
-    			<select th:field="*{statusCode}">
+    			<select th:field="*{statuscode}">
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statuscode})"></option>		
     			</select>
 			</td>            									
 		</tr>
@@ -72,12 +73,21 @@
             <td>部署</td>
             <td><input type="text" th:field=*{divisionname} required/></td>						
 		</tr>
+		
+		<tr>
+            <td>写真</td>
+            <td rowspan="2"><img th:src=*{imgString} style="width: 100px;"/></td>						
+		</tr>
+		<tr>
+            <td><input type="file" th:field=*{imgfile} onchange="previewFile()" /></td>						
+		</tr>
+		
         <tr>
             <td></td>
             <td>
 				<button type="button" onclick="history.back()">戻る</button>
     			<button type="button" onclick="insertclick()">登録</button>
-   				<button type="reset">Restet</button>
+   				<button type="reset" onclick="resetclick()">Reset</button>
             </td>
         </tr>		
 	</table>
@@ -100,18 +110,18 @@
 		<tr>
             <td>状態</td>
             <td>
-    			<select th:field="*{stateCode}">
+    			<select th:field="*{statecode}">
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statecode})"></option>		
     			</select>
 			</td>
 		</tr>
 		<tr>
             <td>雇用形態</td>
             <td>
-    			<select th:field="*{statusCode}">
+    			<select th:field="*{statuscode}">
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statuscode})"></option>		
     			</select>
 			</td>
             									
@@ -120,17 +130,26 @@
             <td>部署</td>
             <td><input type="text" th:field=*{divisionname} required/></td>						
 		</tr>
+		
+		<tr>
+            <td>写真</td>
+            <td rowspan="2"><img th:src=*{imgString} style="width: 100px;"/></td> 					
+		</tr>
+		<tr>
+            <td><input type="file" th:field=*{imgfile} onchange="previewFile()" /></td>							
+		</tr>
+		
         <tr>
             <td></td>
             <td>
 				<button type="button" onclick="history.back()">戻る</button>
     			<button type="button" onclick="updateclick()">登録</button>
-   				<button type="reset">Restet</button>
+   				<button type="reset" onclick="resetclick()">Reset</button>
             </td>
         </tr>		
 	</table>
-	</th:block>
-	
+	</th:block>	
+
 	<th:block th:if="${title=='削除'}">
 	<table class="table-center">
 		<tr>
@@ -148,18 +167,18 @@
 		<tr>
             <td>状態</td>
             <td>
-    			<select th:field="*{stateCode}" disabled>
+    			<select th:field="*{statecode}" disabled>
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{stateCode})"></option>		
+					<option th:each="item:*{mapitems.get('state')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statecode})"></option>		
     			</select>
 			</td>
 		</tr>
 		<tr>
             <td>雇用形態</td>
             <td>
-    			<select th:field="*{statusCode}" disabled>
+    			<select th:field="*{statuscode}" disabled>
 					<option th:value="0"></option>
-					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusCode})"></option>		
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statuscode})"></option>		
     			</select>
 			</td>
             									
@@ -167,6 +186,10 @@
 		<tr>
             <td>部署</td>
             <td><input type="text" th:field=*{divisionname} readonly></td>						
+		</tr>
+		<tr>
+            <td>写真</td>
+            <td rowspan="2"><img th:src=*{imgString} style="width: 100px;"/></td>						
 		</tr>
         <tr>
             <td></td>
@@ -197,28 +220,6 @@ window.onload =  function() {
 	element_user.textContent = "ユーザー：" + user;
 }
 
-	//let url = location.href;
-	//url = url.replace('/update','/list?statusKey=1');
-	//alert (url);
-	//history.pushState(null, null, url);
-	//history.pushState(null, null, null);
-  
-/*
-window.onpopstate = function() {
-    alert("back clicked");
-    history.pushState(null, null, null);
-    backButtonClicked = false;
-    return;
-};
-
-
-window.addEventListener('popstate', (e) => {
-	//history.pushState(null, null, url);
-    alert(location.href);
-    return;
-});
-*/
-
 function insertclick() {
 	//history.pushState(null, null, null);
     let form = document.getElementById('form');
@@ -243,6 +244,47 @@ function deleteclick() {
   	form.action = "/delete_write";
     form.submit();	
 }
+
+function resetclick() {
+  	const preview = document.querySelector("img");
+  	if (preview.src !=/*[[${UserForm.imgString}]]*/""){
+		preview.src = /*[[${UserForm.imgString}]]*/"";
+		return;	  
+	}else if (preview.src != ""){
+		let result = confirm('画像を削除しますか？');
+		if(!result) return;
+		preview.src = "";				  
+	}
+	return;
+}
+
+function previewFile() {
+	const allowedFileTypes = ["image/png", "image/jpeg", "image/gif"];
+  	const preview = document.querySelector("img");
+  	//const file = document.querySelector("input[type=file]";).files[0];
+  	const file = document.getElementById("imgfile").files[0];
+  	if (file.length == 0) {
+    	alert("ファイルサイズが０バイトです。");
+    	document.getElementById("imgfile").value = "";
+    	return;
+  	}
+  	  	
+	if (! allowedFileTypes.includes(file.type)){
+    	alert("画像ファイルではありません。");
+    	document.getElementById("imgfile").value = "";
+    	return;		
+	}  	  	
+  	const reader = new FileReader();
+	reader.addEventListener("load",() => {
+    	preview.src = reader.result;
+    },
+    	false,
+  	);
+  	if (file) {
+    	reader.readAsDataURL(file);
+  	}
+}
+
 
 </script>
 
