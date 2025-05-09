@@ -253,13 +253,15 @@ function resetclick() {
 	}else if (preview.src != ""){
 		let result = confirm('画像を削除しますか？');
 		if(!result) return;
+        const imgString = document.getElementById('imgString');
+		imgString.value = "";
 		preview.src = "";				  
 	}
 	return;
 }
 
 function previewFile() {
-	const allowedFileTypes = ["image/png", "image/jpeg", "image/gif"];
+	const allowedFileTypes = ["image/png", "image/jpeg"];
   	const preview = document.querySelector("img");
   	//const file = document.querySelector("input[type=file]";).files[0];
   	const file = document.getElementById("imgfile").files[0];

@@ -214,7 +214,7 @@ public class UserService {
         	jdbcTemplate.update(query, new Object[] {form.getCode()});
         	query = "INSERT INTO image (code, image, contentType) VALUES (?,?,?)";  
         	jdbcTemplate.update(query, new Object[] {form.getCode(), data, contenttype});
-        }else if (form.getImgString() == "") {
+        }else if (form.getImgString().equals("")) {
         	query = "DELETE FROM image WHERE code = ?";        	
         	jdbcTemplate.update(query, new Object[] {form.getCode()});        	
         }
@@ -231,6 +231,9 @@ public class UserService {
 		return true;
 	}
 	
+	/*
+	アップロードしたファイルをサーバーの指定ディレクトリに格納する
+	*/
 	public void fileupload(MultipartFile multipartFile) throws Exception{
 		StringBuffer filePath = new StringBuffer("uploadfiles/");
 		// アップロードファイルを格納するディレクトリを作成する
