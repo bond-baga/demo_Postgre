@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      class="list">
+      
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="./css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>list</title>  
+</head>
+
+<body>	
+<header>
+	<div class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  		
+  		<p><span class="user">
+			  <label id="user"></label>
+   			  <button type="button" onclick="menuclick()">menu</button>
+  		   </span>
+  		</p>  		
+	</div>	 
+</header>
+
+<form id="form" method="post" th:object="${UserForm}" th:action="@{/search}">
+	<input type="hidden" th:field="*{mapstring}">
+	<input type="hidden" id="code" th:field="*{code}">
+	<input type="hidden" id="page" th:field="*{page}">
+	<input type="hidden" id="maxpage" th:field="*{maxpage}">
+
+	<table class="table-center">
+        <tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{searchname}/></td>
+        </tr>          
+        <tr>
+            <td>カナ</td>
+            <td><input type="text" th:field=*{searchkana}/></td>
+        </tr>
+
+        <tr>
+            <td>状態</td>
+            <td>
+				<th:block th:each="item:*{mapitems.get('state')}">
+      			<label th:for="${#ids.next('id_')}" th:text="${item.value}"></label>
+      			<input type="checkbox" th:id="${#ids.seq('id_')}" th:field="*{statekeys}" th:value="${item.key}" th:checked="${#lists.contains({statekeys}, {item.key})}">
+    			</th:block><br>	
+            </td>
+        </tr> 
+        <tr>
+          	<td>雇用形態</td>
+            <td>
+    			<select th:field="*{statusKey}">
+					<option th:value="0"></option>
+					<option th:each="item:*{mapitems.get('status')}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{statusKey})"></option>		
+    			</select>
+			</td>			
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="searchclick()">検索</button>
+				<button type="button" onclick="insertclick()">新規</button> 
+            </td>
+        </tr>
+    </table>	
+
+	<div class="txtscl" style="height:40vh;">
+	<table>
+
+	<colgroup>
+      <col style="width: 5%;">
+      <col style="width: 10%;">
+      <col style="width: 10%;">
+      <col style="width: 5%;">
+      <col style="width: 10%;">
+      <col style="width: 30%;">
+      <col style="width: 5%;">
+      <col style="width: 5%;">
+      <col style="width: 5%;">
+    </colgroup>		
+		
+	<thead>
+	<tr>
+    <th>コード</th>
+    <th>氏名</th>
+    <th>カナ</th>
+    <th>状態</th>
+    <th>雇用形態</th>
+    <th>部署</th>
+    <th>写真</th>
+    <th>編集</th>
+    <th>削除</th>
+  	</tr>
+	</thead>
+
+	
+	<tbody>		
+	<tr th:each="user : ${data}" th:object="${user}">
+    <td th:text="*{code}"></td>
+    <td th:text="*{name}"></td>
+    <td th:text="*{kana}"></td>
+    <td th:text="*{statename}"></td>
+    <td th:text="*{statusname}"></td>
+    <td th:text="*{divisionname}"></td>
+    <td><div>
+		<img th:src="*{imgString}"/>
+	</div></td>  
+    <td>    
+	<a href="javascript:void(0);" th:onclick="updateclick([[*{code}]])">編集</a>        
+    </td>
+    
+    <td>    
+	<a href="javascript:void(0);" th:onclick="deleteclick([[*{code}]])">削除</a>        
+    </td>
+
+  	</tr>
+	</tbody>
+	</table>
+	</div>
+</form>
+
+ <nav><ul class="pagination" id="pagination"></ul></nav>
+
+
+<footer>
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">
+		
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+	let user = /*[[${session.user['fullname']}]]*/"user";
+		
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+    let element_user = document.getElementById("user");	
+	element_user.textContent = "ユーザー：" + user;
+	localStorage.clear();
+
+   	// ページネーション
+   	let pageElement = document.getElementById("page");
+	let page = pageElement.value;
+	const pages = 4;
+	// 現在のページから切り変わり数（親ページ）を求める
+    let sec = Math.floor((page-1)/pages) + 1;
+   	let maxpageElement = document.getElementById("maxpage");
+	let maxpage = maxpageElement.value;
+    
+    html = '';
+    for (i = (sec-1) * pages + 1; i <= sec * pages && i <= maxpage; i++) {
+     	if (i ==(sec-1) * pages + 1) {
+			if (page > 1){ 
+				// ページが１ページから始まらない場合は「<<」を表示する
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${parseInt(page)-1})">&laquo;</a></li>`;
+    		}
+    		if (sec > 1){
+				// ４ページずつ表示するセクションが１でない場合（５ページ目が先頭ページの場合）１ページ目へのリンクと「・・」を表示。
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${1})">1</a></li>`;
+    			if (i != 2){
+    				html += `<li class="page-item disabled"><a class="page-link" href="javascript:void(0);">・・</a></li>`;
+ 				}
+ 			}
+ 		}
+ 		if (i == page){
+  			html += `<li class="page-item active"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${i})">${i}</a></li>`;			 
+		}else{
+  			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${i})">${i}</a></li>`;
+  		}
+  		if (i == sec * pages || i == maxpage) {
+			// 表示する右端  
+			if (sec != Math.floor((maxpage-1)/pages) + 1){	
+				// ４ページずつ表示するセクションが最終でない場合、最終ページへのリンクと「・・」を表示。
+    			if (maxpage != pages+1){
+    				html += `<li class="page-item disabled"><a class="page-link" href="javascript:void(0);">・・</a></li>`;
+				}
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${maxpage})">${maxpage}</a></li>`;
+			}
+			if (page != maxpage){	  
+				// ページが最終ページで終わらない場合は「>>」を表示する
+				html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${parseInt(page)+1})">&raquo;</a></li>`;
+  			}
+  		}
+  	}
+ 	document.getElementById('pagination').innerHTML = html;	
+}
+	 
+function insertclick() {
+    let form = document.getElementById("form");
+    let input = document.getElementById("code");
+    input.value = '';
+    form.action="/insert";
+    form.submit();
+}  
+
+function searchclick(){
+    let form = document.getElementById("form");
+    form.action="/search";
+    form.submit();	
+}
+
+function menuclick() {
+	let result = confirm('メニューに戻りますか？');
+	if (!result) return;
+    let form = document.getElementById("form");
+    form.method="get";
+    form.action="/menu";
+    form.submit();	
+}
+	
+function updateclick(code) {
+    let form = document.getElementById("form");
+    let input = document.getElementById("code");
+    input.value = code;
+    form.action="/update";
+    form.submit();	
+}  
+
+function deleteclick(code) {
+    let form = document.getElementById("form");
+    let input = document.getElementById("code");
+    input.value = code;
+    form.action="/delete";
+    form.submit();	
+}  
+
+function pageclick(num) {
+	// 検索項目を変更してからページ変更した場合は
+	// 検索条件を元にもどしてから変更されたページのデータ検索を行う
+    let form = document.getElementById("form");
+	form.reset();
+	
+	let page = document.getElementById("page");
+	page.value = num;
+		
+    form.action="/page";
+    form.submit();
+}  
+
+</script>
+
+
+</body>
+</html>
