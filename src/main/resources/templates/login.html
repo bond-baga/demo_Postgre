@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      class="login">
+      
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="./css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>login</title>
+</head>
+
+<body>
+<header>
+	<div class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  
+  		<p></p>		
+	</div>
+</header>
+
+<form th:action="@{/authenticate}" method="post" th:object="${LoginForm}">
+
+    <div class="slightly-left">
+    <h3>登録済みのアカウントを入力してください。</h3>     
+    <p class="error" th:if="${param.failed}" th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"></p>
+    <p class="info" th:if="${param.logout}">ログアウトしました。<br>このサイトを利用する場合はもう一度ログインしてください。</p>
+    </div>
+    
+	<div class="slightly-left">	   	
+	<th:block th:if="${not LoginForm.msg.isEmpty()}">
+	    <th:block th:each="item:*{msg}" th:object="${item}">
+			<label class="error" th:text="${item.value}"></label><br>		
+		</th:block>
+	</th:block>
+	</div>
+    
+	<table class="table-center">
+        <tr>
+            <td>ユーザー</td>
+            <td><input type="text" th:field=*{username} placeholder="Username"/></td>
+        </tr>
+          
+        <tr>
+            <td>パスワード</td>
+            <td><input type="password" th:field=*{password} placeholder="Password"/></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+    			<input type="submit" value="ログイン" />
+				<button type="button" onclick="history.back()">戻る</button>    			
+            </td>
+        </tr>
+    </table>    
+</form>
+	    
+    <div class="slightly-left">
+	<p>アカウントが無い方 <a th:href="@{/register}">新規アカウントを作成</a></p>
+    </div>
+
+<footer>
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">		
+
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+	
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+}
+     
+</script>
+</body>
+</html>

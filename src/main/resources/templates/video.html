@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      class="video">
+      
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="./css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>list</title>
+</head>
+
+<body>	
+<header>
+	<div id="headerbox" class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  		
+  		<p><span class="user">
+			  <label id="user"></label>
+   			  <button type="button" onclick="menuclick()">menu</button>
+  		   </span>
+  		</p>  		
+	</div>	
+</header>
+
+<form id="form" method="post" th:object="${VideoForm}" th:action="@{/video_insert}" enctype="multipart/form-data">
+	<input type="hidden" th:field=*{page}>
+	<input type="hidden" th:field=*{maxpage}>	
+	<input type="hidden" th:field=*{loginid}>
+	
+	<div class="slightly-left">	   	
+	<th:block th:if="${not VideoForm.msg.isEmpty()}">
+	    <th:block th:each="item:*{msg}" th:object="${item}">
+			<label class="error" th:text="${item.value}"></label><br>		
+		</th:block>
+	</th:block>
+	</div>
+
+	<table class="table-center">
+		<tr></tr>
+        <tr>
+			<td style="width: 400px;">新規投稿：
+    			<input type="file" th:field=*{videofiles} multiple onchange="previewFile()" />
+            </td>
+			<td style="width: 300px;">表示順：
+				<select th:field="*{dispindex}"  onchange="search()">
+				<option th:each="item:*{disporder}" th:value="${item.key}" th:text="${item.value}" th:selected="(${item.key}==*{dispindex})"></option>		
+    			</select>
+			</td>
+        </tr>
+        <tr></tr>
+	</table>
+
+	<div class="videoscl" style="height:70vh;">
+	<table id="tbl"> 
+	<colgroup>
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+      <col style="width: 30%;">
+    </colgroup>		
+	
+	<tbody>		
+    <th:block th:unless="${#lists.size(VideoForm.items) < 1}" th:each="i : ${#numbers.sequence(0,__${#lists.size(VideoForm.items)-1}__)}">
+
+		<th:block th:if="${i % 3 == 0}">	
+			<tr>
+		</th:block>		
+		
+    	<td>
+			<div>
+				<video controls th:src="*{items[__${i}__]['filename']}"></video>
+				<img th:id = "chkimg__${i}__" src="/images/check.png" style="display:none"/>								
+				<img th:id = "delimg__${i}__" src="/images/delete.png" style="display:none"/>
+			</div>	
+			<div>
+				<textarea class="textarea" th:field="*{items[__${i}__]['comment']}"></textarea>
+			</div>
+			<input type="hidden" th:field="*{items[__${i}__]['filename']}"> 
+			<input type="hidden" th:field="*{states[__${i}__].insert}">
+			<input type="hidden" th:field="*{states[__${i}__].update}">
+			<input type="hidden" th:field="*{states[__${i}__].delete}">
+
+		</td>  
+		<th:block th:if="${i % 3 == 2} OR ${i == #lists.size(VideoForm.items)}">	
+			</tr>
+		</th:block>		
+
+	</th:block>
+	</tbody>
+	
+	</table>
+	</div>
+    
+	<table class="table-center">
+        <tr>
+			<td style="width: 100px;"></td>
+            <td>
+    			<button type="button" onclick="insertclick()">登録</button>
+   				<button type="reset" onclick="resetclick()">Reset</button>
+            </td>
+        </tr>
+	</table>
+
+</form>
+
+
+<menu id="popupmenu" class="popupmenu" style="display:none">	
+  <li><label id="popupreset">変更取り消し</label></li>
+  <li><label id="popupdelete">削除</label></li>
+</menu>
+
+
+ <nav><ul class="pagination" id="pagination"></ul></nav>
+
+<footer>
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {	
+	// ポップアップメニュー
+	const popupmenu = document.getElementById('popupmenu');
+	// ビデオエレメント取得		
+	const video = document.getElementsByTagName('video');
+	// textareaエレメント取得		
+	const textarea = document.getElementsByTagName('textarea');
+	// ポップアップメニュー
+	const popupreset = document.getElementById('popupreset');
+	// ポップアップメニュー
+	const popupdelete = document.getElementById('popupdelete');
+
+	var itemsList = /*[[${VideoForm.items}]]*/[];
+
+	let filename;
+	let comment;
+	let num;
+
+	// 右ボタンクリックイベント
+	for (let i = 0; i < video.length; i++) {
+		var videoUrl = video[i].src;
+		
+		// コンテキストメニュー
+    	video[i].addEventListener('contextmenu', function(event) {
+			// ビデオエレメントのコンテキストイベントを無効にする
+       		event.preventDefault(); // Prevent the default browser context menu  		
+			
+			// eventのclientX(Y)はViewのpostion　＞　HTMLの左上のpositionで補正
+			const element = document.getElementById('headerbox');
+			const rect = element.getBoundingClientRect();
+			
+   			if (popupmenu.style.display == 'none'){	
+				popupmenu.style.top = event.clientY - rect.top + "px";
+				popupmenu.style.left = event.clientX - rect.left + "px";   
+				popupmenu.style.display = 'block';   
+			}else{
+				popupmenu.style.display = 'none';   
+			}
+			
+			filename = itemsList[i]['filename'];
+			comment = itemsList[i]['comment'];
+			num = i.toString();		
+  		});  
+ 	}
+
+	// ドキュメントクリックイベント　＞　Right Button Clickでは発火されない
+	document.addEventListener('click', function(event) {
+		filename = "";
+		comment = "";
+  		if (popupmenu.style.display === 'block' && !popupmenu.contains(event.target)) {
+   			popupmenu.style.display = 'none';
+   		}
+	});
+   	
+	// ポップアップメニュー　＞　編集取り消し
+	popupreset.addEventListener('click', function() {
+		if (textarea[num].value != itemsList[num]['comment']){
+			textarea[num].value = itemsList[num]['comment'];						
+			document.getElementById("chkimg" + num).style.display = "none";
+			document.getElementById("states["+num+"].update").value = false;
+
+		}else{
+			alert("変更されていません。");
+		}
+		popupmenu.style.display = 'none';   
+    });
+	
+	// ポップアップメニュー　＞　削除
+	popupdelete.addEventListener('click', function() {
+   		let delimg = document.getElementById("delimg" + num);
+		if (delimg.style.display === "block") {
+        	delimg.style.display = "none";
+			document.getElementById("states" + num + ".delete").value = false;
+        	// 削除解除して変更済になる場合
+        	comment = itemsList[num]['comment'];
+			if (comment != textarea[num].value){		
+				document.getElementById("chkimg" + num).style.display = "block";
+				document.getElementById("states"+ num +".update").value = true;
+			}
+    	} else {
+			document.getElementById("chkimg" + num).style.display = "none";
+        	delimg.style.display = "block";
+			document.getElementById("states" + num + ".delete").value = true;
+    	}
+		popupmenu.style.display = "none";   
+    });
+    
+    
+    let no;
+    let message;
+    
+	// 	テキストエリアの値比較
+	for (let i = 0; i < textarea.length; i++) {			
+		// focusイベント
+    	textarea[i].addEventListener('focus', function(event) {
+			// focusのタイミングで要素の添え字とコメントを保存
+			no = i.toString();		
+			message = itemsList[i]['comment'];
+			// テキストエリアの改行コードはnew lineのみ（line feedは
+			message=message.replace("\r\n","\n");
+		});  
+
+		//　blurイベント
+    	textarea[i].addEventListener('blur', function(event) {
+			if (message != textarea[i].value){	
+				document.getElementById("delimg" + no).style.display = "none";
+				document.getElementById("chkimg" + no).style.display = "block";				
+				document.getElementById("states"+ no +".update").value = true;
+			}else{
+				document.getElementById("chkimg" + no).style.display = "none";
+				document.getElementById("states"+ no +".update").value = false;
+			}
+  		});  
+ 	}
+});	
+	
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+	let user = /*[[${session.user['fullname']}]]*/"user";
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+    let element_user = document.getElementById("user");	
+	element_user.textContent = "ユーザー：" + user;
+   	
+
+   	// ページネーション
+   	let pageElement = document.getElementById("page");
+	let page = pageElement.value;
+	const pages = 4;
+	// 現在のページから切り変わり数（親ページ）を求める
+    let sec = Math.floor((page-1)/pages) + 1;
+   	let maxpageElement = document.getElementById("maxpage");
+	let maxpage = maxpageElement.value;
+    html = '';
+    for (i = (sec-1) * pages + 1; i <= sec * pages && i <= maxpage; i++) {
+     	if (i ==(sec-1) * pages + 1) {
+			if (page > 1){ 
+				// ページが１ページから始まらない場合は「<<」を表示する
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${parseInt(page)-1})">&laquo;</a></li>`;
+    		}
+    		if (sec > 1){
+				// ４ページずつ表示するセクションが１でない場合（５ページ目が先頭ページの場合）１ページ目へのリンクと「・・」を表示。
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${1})">1</a></li>`;
+    			if (i != 2){
+    				html += `<li class="page-item disabled"><a class="page-link" href="javascript:void(0);">・・</a></li>`;
+ 				}
+ 			}
+ 		}
+ 		if (i == page){
+  			html += `<li class="page-item active"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${i})">${i}</a></li>`;			 
+		}else{
+  			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${i})">${i}</a></li>`;
+  		}
+  		if (i == sec * pages || i == maxpage) {
+			// 表示する右端  
+			if (sec != Math.floor((maxpage-1)/pages) + 1){	
+				// ４ページずつ表示するセクションが最終でない場合、最終ページへのリンクと「・・」を表示。
+    			if (maxpage != pages+1){
+    				html += `<li class="page-item disabled"><a class="page-link" href="javascript:void(0);">・・</a></li>`;
+				}
+    			html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${maxpage})">${maxpage}</a></li>`;
+			}
+			if (page != maxpage){	  
+				// ページが最終ページで終わらない場合は「>>」を表示する
+				html += `<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="pageclick(${parseInt(page)+1})">&raquo;</a></li>`;
+  			}
+  		}
+  	}
+ 	document.getElementById('pagination').innerHTML = html;	
+}
+	
+function search(){
+  	form.action = "/video";
+    form.submit();	
+}
+	 
+function menuclick() {
+	let result = confirm('メニューに戻りますか？');
+	if (!result) return;
+    let form = document.getElementById("form");
+    form.method="get";
+    form.action="/menu";
+    form.submit();	
+}
+	
+function insertclick() {
+	let files = document.getElementById('videofiles');
+	if (files.value == ''){
+		//　変更
+		let result = confirm('コメントを更新しますか？');
+		if(!result) return;
+								
+    	let form = document.getElementById('form');
+  		form.action = "/video_update";
+    	form.submit();	
+    	return;
+	}
+	
+	// 新規登録
+	let result = confirm('編集内容を登録しますか？');
+	if(!result) return;
+    let form = document.getElementById('form');
+  	form.action = "/video_insert";
+    form.submit();	
+}
+	
+function pageclick(num) {
+	// 検索項目を変更してからページ変更した場合は
+	// 検索条件を元にもどしてから変更されたページのデータ検索を行う
+    let form = document.getElementById("form");
+	form.reset();
+	
+	let page = document.getElementById("page");
+	page.value = num;
+		
+    form.action="/video_page";
+    form.submit();
+}  
+
+function resetclick() {
+	let files = document.getElementById('videofiles');
+	if (files.value == ''){
+		return;
+	}
+	
+    const tbl = document.getElementById("tbl")
+    const tbody = tbl.getElementsByTagName('tbody')[0];
+ 	tbody.innerHTML = '';
+	
+	let items = /*[[${VideoForm.items}]]*/"items";
+
+	let i;
+	let row;
+	let cell;
+	let html;
+	for (i = 0; i < items.length; i++){
+ 		if (i % 3 == 0){
+   		row = tbl.insertRow(-1);
+   		cell = row.insertCell(0);
+ 		} else {
+   		cell = row.insertCell(i % 3);			
+ 		}
+
+		cell.innerHTML="<div><video controls src=\""+items[i]['filename']+"\""+"style='width: 270px; height: 270px;'></video></div>"
+		+ "<div><input type='hidden' name=items["+i+"]['filename'] value="+items[i]['filename']+"></input></div>"
+		+ "<div><textarea name=items["+i+"]['comment'] style='width: 270px;'>"+items[i]['comment']+"</textarea></div>";
+	}	
+	files.value = '';
+	let mediaElem = document.querySelector("video");
+	mediaElem.load();
+	return;
+}
+
+function previewFile() {
+	const allowedFileTypes = ["video/mp4"];
+  	const files = document.getElementById("videofiles").files;
+	
+	let i;	
+
+	if (files.length > 10){
+    	alert("画像ファイルは１０件以内にしてください。");
+    	document.getElementById("videofile").value = "";
+    	return;		
+	}
+	for (i = 0; i < files.length; i++){
+		let file=files[i];
+  	  	
+		if (! allowedFileTypes.includes(file.type)){
+    		alert("画像ファイルではありません。");
+    		document.getElementById("videofile").value = "";
+    		return;		
+		} 		
+
+		if (file.size > 20 * 1024 * 1024){
+    		alert("ファイルサイズが２０MBを超えています。");
+    		document.getElementById("videofile").value = "";
+    		return;				
+		}	
+	}
+
+	let row;
+	let cell;
+    const tbl = document.getElementById("tbl")
+    const tbody = tbl.getElementsByTagName('tbody')[0];
+ 	tbody.innerHTML = '';
+ 	let html = "";
+
+	for (i = 0; i < files.length; i++){
+		let file=files[i];
+		if (i % 3 == 0){
+			row = tbl.insertRow(-1);
+			cell = row.insertCell(0);
+		} else {
+			cell = row.insertCell(i % 3);			
+		}
+		
+		html="<div><video controls id = video" + ('00' + Number(i)).slice(-2) + " src='' style='width: 270px; height: 270px;'></video>";		
+		html +="<div><textarea name=items["+i+ "]['comment'] style='width: 270px;'></textarea></div>";
+		cell.innerHTML = html;		
+  		const reader = new FileReader();
+  		const preview = document.getElementById("video" + ('00' + Number(i)).slice(-2));
+		reader.addEventListener("load",() => {
+    	preview.src = reader.result;
+    	},
+    		false,
+  		);
+  		if (file) {
+    		reader.readAsDataURL(file);
+  		}
+	}
+	for (i = 0; i < files.length; i++){
+		let comment = document.getElementById("comments[" + i + "]");
+		comment.value = "";
+	}	
+}
+
+</script>
+</body>
+</html>
