@@ -1,0 +1,334 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+header {
+	position: relative; 
+ 	top: 0;
+ 	width:100%;
+	text-align: center;	
+	color:#FFFFFF;
+ 	background-color: #000080;
+}
+
+footer{
+	position: relative;
+	bottom: 0px; 
+ 	width:100%;
+	text-align: center;	
+	color:#FFFFFF;
+ 	background-color: #000080;
+}
+
+#custom-message {
+    position:relative;
+    color: rgb(230, 200, 98);
+    z-index:1;
+    top: 0;
+    text-align: center;    
+}​
+
+.popupmenu {
+	display: none; /* Hidden by default */
+    position:absolute; 
+    /*
+	top:100px;
+	left:400px;
+	*/
+    background-color:#BBFFFF;
+	padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.overlay {
+/*	
+  position: absolute;
+  width: 40%;
+  left: 30%;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  
+  transform: translateY(-50%);
+*/ 
+  position: absolute;
+/*  width: 2%; */
+  
+  left: 0px;
+  top: 0px;
+  
+  
+  transform:scale(0.1, 0.1);
+  
+  /*
+  transform:translate(0%, 0%);
+  
+  transform:scale(0.5, 0.5);;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  
+  transform: translateX(-50%);
+  transform: translateY(-50%);
+  */	
+}
+
+/* This is a div tag not a table tag. */ 
+.txtscl, .imgscl{
+    overflow: auto;
+    width: 100%;
+}
+
+.txtscl table, .imgscl table{
+	border:1px solid black;
+	border-collapse: collapse;	
+	background-color: #BBFFFF;
+}
+
+.txtscl th, .imgscl th{
+	border:1px solid white;
+	color: white;
+    background-color: #0000ff;  /* 背景色:blue */
+    white-space: nowrap;
+    position: sticky;              /* 見出し固定 top,leftも必要*/	
+	top:0;
+    left:0;
+    z-index: 2;
+}
+
+.txtscl td{
+	border:1px solid black;
+	color: black;
+    white-space: nowrap;
+/*    padding: 1%; */
+}
+
+.imgscl td{
+	border :none;
+	color: black;
+    white-space: nowrap;
+    padding: 1%;
+}
+
+.txtscl td div, .imgscl td div {
+  position:relative;
+  width: inherit;
+  height: inherit;
+}
+
+.txtscl td div img, .imgscl td div img {
+  width: 100%;
+  display: block;  /* Removes extra space below the video */
+}
+
+.txtscl td div video, .imgscl td div video {
+  width: 100%;
+  display: block; /* Removes extra space below the video */
+}
+
+.overlay-text {
+	position: absolute; /* Positions the text relative to the .video-container */
+	top: 50%; /* Adjust as needed for vertical positioning */
+	left: 50%; /* Adjust as needed for horizontal positioning */
+	transform: translate(-50%, -50%); /* Centers the text precisely */
+	color: white; /* Or desired text color */
+	text-align: center;
+	z-index: 2; /* Ensures the text appears above the video */
+        /* Add other styling like font-size, padding, background-color, etc. */
+	font-size: large;	
+        
+}
+
+.overlay-icon {
+	position: absolute;
+	top: 10px; /* Adjust position as needed */
+	left: 10px; /* Adjust position as needed */
+	width: 50px; /* Example size */
+	height: 50px; /* Example size */
+	pointer-events: all; /* Makes the icon clickable */
+}
+    
+.textarea {
+	position:relative;	
+    display: flex;
+	width:100%;
+	height:100%;
+	color: black; /* Or desired text color */
+	text-align: left;
+}
+
+.textdisp {
+	position:absolute;	
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width:100%;
+	color: white; 
+	text-align: left;
+	z-index: 2;
+	font-size: x-large;		
+  	overflow: hidden;	
+	background-color: transparent;
+/*
+  	border: solid;
+  	outline: none;	
+*/
+}
+    
+.container {
+  display: grid;
+  grid-template-columns: 1fr; /* One columns */
+  grid-gap: 200px;
+  
+  /*margin-top: 10%;   上に10pxのマージン */
+  margin-right: 2%; /* 右に20pxのマージン */
+  /*margin-bottom: 10%;   下に10pxのマージン */
+  margin-left: 2%; /* 左に20pxのマージン */  
+}
+
+.item1 {
+  grid-column: 1; /* First column */
+  grid-row: 1;    /* First row */
+}
+
+.item2 {
+  grid-column: 2; /* Second column */
+  grid-row: 1;    /* First row */
+}
+
+.float-image {
+  float: left;
+  margin-right: 10px; /* Space between image and text */
+}
+ 
+.login{
+	width:30vw; 
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.menu{
+	width:40vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.list{
+	width:60vw;
+	margin: auto;
+	margin-top:2vh; 
+}
+
+.video{
+	width:60vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.open{
+	width:60vw;
+	margin: auto;
+	margin-top:2vh; 
+}
+
+.register{
+	width:40vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.edit{
+	width:60vw;
+	margin: auto;
+    margin-top:10vh;  
+}
+
+
+.box{
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  justify-content: space-around;
+  height: 50px;  
+}
+
+.form-center {
+	/*
+    width: fit-content;
+    margin: auto;
+    */
+    
+    /*
+ 	display: flex;
+ 	*/
+    justify-content: center;    
+}
+
+.table-center {
+ 	display: flex;
+    justify-content: center;    
+}
+
+.menu-center{
+	width:100%;	
+ 	display: flex;
+    justify-content: center;    
+}
+
+.slightly-left{
+	padding-left:30%;
+}
+
+.title{
+	font-size: xx-large;
+}
+
+.user{
+	font-size: medium;	
+}
+
+.error{
+	color:red;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.info{
+	color:blue;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.menu-button{
+  display: block;
+  width: 160px;
+  height: 40px;
+  /*padding: 10px 5px 10px 5px;*/	
+  margin: 10px 5px 10px 5px;	
+  font-size:x-large;	
+}
+
+.pagination{display:flex; justify-content:center;list-style:none}
+.page-link{position:relative;display:block;color:#0d6efd; font-size:  medium; text-decoration:none;background-color:#fff;border:1px solid #dee2e6;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out}
+.page-item.active 
+.page-link{z-index:3;color:#fff;background-color:#0d6efd;border-color:#0d6efd}
+ 
+.page-item.disabled 
+.page-link{color:#6c757d;pointer-events:none;background-color:#fff;border-color:#dee2e6}
+.page-link{padding:.375rem .75rem}
+ 
+ 

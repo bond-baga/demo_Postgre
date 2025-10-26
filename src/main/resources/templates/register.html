@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      class="register">
+	
+<head>
+  <meta charset="UTF-8">
+ <link rel="stylesheet" href="./css/example.css">
+  <script src="./js/jquery-3.7.1.js"> </script>
+  <script src="./js/main.js"></script>
+  <title>login</title>
+</head>
+
+<body>
+<header>
+	<div class="box">
+  		<p></p>
+  		<p><span class="title"><label id="title"></label></span></p>  
+  		<p></p>		
+	</div>	
+</header>
+
+<form th:action="@{/register}" method="post" th:object="${LoginForm}">
+    <div class="slightly-left">
+	<h3>新規のユーザーアカウントが登録できます。</h3>     
+    </div>
+    
+    <div class="slightly-left">	   	
+	<th:block th:if="${not LoginForm.msg.isEmpty()}">
+	    <th:block th:each="item:*{msg}" th:object="${item}">
+			<label class="error" th:text="${item.value}"></label><br>		
+		</th:block>
+	</th:block>
+	</div>
+
+      
+    <form th:action="@{/register}" method="post" th:object="${LoginForm}">
+	<table class="table-center">
+        <tr>
+            <td>ユーザーID</td>
+            <td><input type="text" th:field=*{username} required/></td>
+        </tr>          
+        <tr>
+            <td>パスワード</td>
+            <td><input type="password" th:field=*{password} required/></td>
+        </tr>
+
+        <tr>
+            <td>氏名</td>
+            <td><input type="text" th:field=*{fullname} required/></td>
+        </tr>          
+        <tr>
+            <td>e-mail</td>
+            <td><input type="email" th:field=*{email} required/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+				<button type="button" onclick="history.back()">戻る</button>
+    			<input type="submit" value="登録" />
+   				<button type="reset">Reset</button>
+            </td>
+        </tr>
+    </table>    
+    </form>
+    
+<footer>
+    <p>© All rights reserved by PALM</p>
+</footer>
+
+<script th:inline="javascript">		
+	
+window.onload =  function() {
+	let title = /*[[${title}]]*/"title";
+    let element_title = document.getElementById("title");	
+	element_title.textContent = title;
+}
+    
+</script>
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+header {
+	position: relative; 
+ 	top: 0;
+ 	width:100%;
+	text-align: center;	
+	color:#FFFFFF;
+ 	background-color: navy;
+}
+
+footer{
+	position: relative;
+	bottom: 0px; 
+ 	width:100%;
+	text-align: center;	
+	color:#FFFFFF;
+ 	background-color: navy;
+}
+
+
+.popupmenu {
+	display: none; /* Hidden by default */
+    position:absolute; 
+    
+    padding-top: 20px;   
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+  	list-style-type: none; /* Removes the bullet points */
+    background-color:white; 
+    border: 1px solid #ccc;
+    z-index: 10;
+}
+
+
+ .popupmenu li {
+ 	width:120px;
+    margin-top:10px;
+    border: 1px solid black;
+}
+
+    
+.popupmenu label{
+	margin-left:10px;
+/*    border: 1px solid red;　*/
+}
+
+
+.overlay {
+/*	
+  position: absolute;
+  width: 40%;
+  left: 30%;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  
+  transform: translateY(-50%);
+*/ 
+  position: absolute;
+  left: 90%;
+  top: 2%;  
+  width:100px;
+  height:100px;
+  
+  /*
+  transform:scale(0.5, 0.5);
+  */
+}
+
+/* This is a div tag not a table tag. */ 
+.listscl, .videoscl, .openscl{
+    overflow: auto;
+    width: 100%;
+}
+
+.listscl table, .videoscl table, .openscl table{
+	border:1px solid black;
+	border-collapse: collapse;	
+    background-color: white;
+}
+
+.listscl th{
+	border:1px solid white;
+	color: white;
+    background-color: blue;/*#0000ff;*/  /* 背景色:blue */
+    white-space: nowrap;
+    position: sticky;              /* 見出し固定 top,leftも必要*/	
+	top:0;
+    left:0;
+    z-index: 2;
+}
+
+.listscl td{
+	border:1px solid black;
+	color: black;
+    white-space: nowrap;
+/*    padding: 1%; */
+}
+
+/*
+divの中にtextareaを表示する場合必要
+position：relativeで無ければコメントがtableで一か所に重なる。
+tdにposition:relativeを設定しても無効
+*/
+/*.listscl td div, .videoscl td div, .openscl td div {*/
+.listscl div, .videoscl div, .openscl div {
+  position:relative;
+  width: inherit;
+  height: inherit;
+}
+
+/*.listscl td div img {*/
+.listscl img {
+  display: block;  /* Removes extra space below the video */
+  width: 100%;
+}
+
+.videoscl td, .openscl td{
+	border :none;
+	color: black;
+    white-space: nowrap;
+    padding: 1%;
+}
+
+/*.videoscl td div video, .openscl td div video{*/
+.videoscl video, .openscl video{
+  display: block; /* Removes extra space below the video */
+  width: 100%;
+}
+    
+/*
+ビデオのチェック、削除のイメージを付加
+*/    
+/*.videoscl td div img{*/
+.videoscl img{
+ 	display: block; /* Removes extra space below the video */
+	position:absolute;	
+	top: 2%;
+	left: 68%;
+/*	transform: translate(-50%, 0%);*/
+	width:30%;
+ 	aspect-ratio: 1 / 1; /* Sets height equal to width (1:1 aspect ratio) */  	
+}
+
+/*
+テキスト入力
+動画と異なるdiv
+*/    
+.textarea {
+	display: block;
+	width:98%;
+/*	height:100px; */
+	color: black; /* Or desired text color */
+	text-align: left;
+	background:rgba(0, 0, 0, 0.1);
+	border: none;
+	padding:1%;
+}
+
+/*
+テキスト表示
+動画と同一のdiv
+*/
+.textdisp {
+	position:absolute;	
+	field-sizing: content;
+	top: 90%;
+	left: 50%;
+	transform: translate(-50%, -100%);
+	
+	width:100%;
+	height:auto;
+	color: white; 
+	text-align: left;
+	z-index: 2;
+	font-size: x-large;		
+  	overflow: hidden;	
+	background-color: transparent;
+
+  	border: none;
+  	outline: none;	
+}
+    
+.login{
+	width:30vw; 
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.menu{
+	width:40vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.list{
+	width:60vw;
+	margin: auto;
+	margin-top:2vh; 
+}
+
+.video{
+	width:60vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.open{
+	width:60vw;
+	margin: auto;
+	margin-top:2vh; 
+}
+
+.register{
+	width:40vw;
+	margin: auto;
+	margin-top:10vh; 
+}
+
+.edit{
+	width:60vw;
+	margin: auto;
+    margin-top:10vh;  
+}
+
+
+.box{
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  justify-content: space-around;
+  height: 50px;  
+}
+
+
+.table-center {
+ 	display: flex;
+    justify-content: center;    
+}
+
+.menu-center{
+ 	display: flex;
+	width:100%;	
+    justify-content: center;    
+}
+
+.slightly-left{
+	padding-left:30%;
+}
+
+.title{
+	font-size: xx-large;
+}
+
+.user{
+	font-size: medium;	
+}
+
+.error{
+	color:red;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.info{
+	color:blue;
+	font-size: large;	
+	white-space: pre-line;
+}
+
+.menu-button{
+  display: block;
+  width: 160px;
+  height: 40px;
+  /*padding: 10px 5px 10px 5px;*/	
+  margin: 10px 5px 10px 5px;	
+  font-size:x-large;	
+}
+
+.pagination{display:flex; justify-content:center;list-style:none}
+.page-link{position:relative;display:block;color:#0d6efd; font-size:  medium; text-decoration:none;background-color:#fff;border:1px solid #dee2e6;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out}
+.page-item.active 
+.page-link{z-index:3;color:#fff;background-color:#0d6efd;border-color:#0d6efd}
+ 
+.page-item.disabled 
+.page-link{color:#6c757d;pointer-events:none;background-color:#fff;border-color:#dee2e6}
+.page-link{padding:.375rem .75rem}
+ 
+ 
