@@ -31,9 +31,20 @@ public class VideoService {
 	ServletContext context;	
 	
 	public void select(VideoForm form) {
-		String query = 
-		"SELECT"+
-		" ROW_NUMBER() OVER(ORDER BY a.loginid ASC, lastupdate DESC) no"+ 
+		String query = "SELECT";
+		switch (form.getDispindex()){
+		default:
+		case 1:
+			query += " ROW_NUMBER() OVER(ORDER BY a.loginid ASC, lastupdate ASC) no";		
+			break;
+		case 2:
+			query += " ROW_NUMBER() OVER(ORDER BY a.loginid ASC, lastupdate DESC) no";		
+			break;
+		case 3:
+			query += " ROW_NUMBER() OVER(ORDER BY a.loginid ASC, comment ASC) no";		
+			break;
+		}
+		query +=
 		",a.loginid"+
 		",a.username"+
 		",a.fullname"+
@@ -78,14 +89,14 @@ public class VideoService {
 					
 					Path p = Paths.get(String.format("%06d", form.getLoginid()), (String)tmp.get(i).get("filename"));
 					mp.put("filename", p.toString());					
-					form.setFullname((String)tmp.get(i).get("fullname"));
+//					form.setFullname((String)tmp.get(i).get("fullname"));
 				}else {
 					// ゲストの場合
 					//mp.put("filename", Paths.get("videofiles",String.format("%06d", form.getContributor()), (String)tmp.get(i).get("filename")));
 										
 					Path p = Paths.get(String.format("%06d", form.getContributor()), (String)tmp.get(i).get("filename"));
 					mp.put("filename", p.toString());					
-					form.setFullname("guest");
+//					form.setFullname("guest");
 				}
 				mp.put("comment", (String)tmp.get(i).get("comment"));
 				form.getItems().add(mp);

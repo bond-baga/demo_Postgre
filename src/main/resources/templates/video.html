@@ -132,8 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	const popupdelete = document.getElementById('popupdelete');
 
 	var items = /*[[${VideoForm.items}]]*/[];
-
-	let filename;
 	let comment;
 	let num;
 
@@ -158,8 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				popupmenu.style.display = 'none';   
 			}
 			
-			filename = items[i]['filename'];
-			comment = items[i]['comment'];
+//			filename = items[i]['filename'];
+//			comment = items[i]['comment'];
 			num = i.toString();		
   		});  
  	}
@@ -177,8 +175,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	// ポップアップメニュー　＞　編集取り消し
 	popupreset.addEventListener('click', function() {
 		popupmenu.style.display = 'none';
-		if (textareas[num].value != items[num]['comment']){
-			textareas[num].value = items[num]['comment'];						
+        // 削除解除して変更済になる場合
+		comment = items[num]['comment'];
+		// テキストエリアの改行コードはnew lineのみ
+		comment=comment.replace(/\r\n$/g,"\n");
+		if (comment != textareas[num].value){
+			textareas[num].value = comment;						
 			document.getElementById("chkimg" + num).style.display = "none";
 			document.getElementById("states"+num+".update").value = false;
 		}else{
@@ -194,7 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
         	delimg.style.display = "none";
 			document.getElementById("states" + num + ".delete").value = false;
         	// 削除解除して変更済になる場合
-        	comment = items[num]['comment'];
+			comment = items[num]['comment'];
+			// テキストエリアの改行コードはnew lineのみ
+			comment=comment.replace(/\r\n$/g,"\n");
 			if (comment != textareas[num].value){		
 				document.getElementById("chkimg" + num).style.display = "block";
 				document.getElementById("states"+ num +".update").value = true;
@@ -206,33 +210,20 @@ document.addEventListener('DOMContentLoaded', function() {
     	}
     });
     
-    
-    let no;
-    let message;
-    
-	// 	テキストエリアのfocusとblurイベント
+   	// 	テキストエリアのblurイベント
 	for (let i = 0; i < textareas.length; i++) {			
-		// focusイベント
-    	textareas[i].addEventListener('focus', function(event) {
-			// focusのタイミングで要素の添え字とコメントを保存
-			no = i.toString();		
-			message = items[i]['comment'];
-						
-			// テキストエリアの改行コードはnew lineのみ
-			message=message.replace(/\r\n$/g,"\n");
-		});  
-
 		//　blurイベント
     	textareas[i].addEventListener('blur', function(event) {
-			if (message != textareas[i].value){	
-				console.log(message);
-				console.log(textareas[i].value);
-				document.getElementById("delimg" + no).style.display = "none";
-				document.getElementById("chkimg" + no).style.display = "block";				
-				document.getElementById("states"+ no +".update").value = true;
+			comment = items[i]['comment'];
+			// テキストエリアの改行コードはnew lineのみ
+			comment=comment.replace(/\r\n$/g,"\n");
+			if (comment != textareas[i].value){	
+				document.getElementById("delimg" + i).style.display = "none";
+				document.getElementById("chkimg" + i).style.display = "block";				
+				document.getElementById("states"+ i +".update").value = true;
 			}else{
-				document.getElementById("chkimg" + no).style.display = "none";
-				document.getElementById("states"+ no +".update").value = false;
+				document.getElementById("chkimg" + i).style.display = "none";
+				document.getElementById("states"+ i +".update").value = false;
 			}
   		});  
  	}
@@ -449,8 +440,8 @@ function previewFile() {
 		} else {
 			cell = row.insertCell(i % 3);			
 		}
-		html = `<div><video controls id=video${i} src=""></video>`
-		html += `<div><textarea  class="textarea" name=items[${i}]['comment'] ></textarea></div>`;
+		html = `<div><video controls id=video${i} src=""></video>
+		        <div><textarea  class="textarea" name=items[${i}]['comment'] ></textarea></div>`;
 		
 		cell.innerHTML = html;		
   		const reader = new FileReader();
